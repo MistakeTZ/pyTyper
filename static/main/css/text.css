@@ -10,11 +10,17 @@ body {
     margin: 0;
 }
 
-#text {
-    font-size: 2rem;
+#textContainer {
+    font-size: 1.5rem;
     max-width: 800px;
-    word-wrap: break-word;
     margin-bottom: 2rem;
+    line-height: 2.5rem;
+    white-space: pre-wrap;
+}
+
+.line {
+    display: block;
+    margin-bottom: 0.5rem;
 }
 
 .correct {

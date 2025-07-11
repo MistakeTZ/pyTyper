@@ -8,51 +8,12 @@
   <link rel="stylesheet" href="{% static 'main/css/text.css' %}">
 </head>
 <body>
-  <div id="text"></div>
+  <div id="textContainer"></div>
   <input type="text" id="inputField" autofocus />
   <div class="container">
     <button id="restartBtn">Restart</button>
     <button id="newTextBtn">New Text</button>
   </div>
-
-  <script>
-    const textDisplay = document.getElementById("text");
-    const inputField = document.getElementById("inputField");
-    const restartBtn = document.getElementById("restartBtn");
-
-    const text = "Быстрая коричневая лиса перепрыгнула через ленивую собаку.";
-    let currentIndex = 0;
-
-    function renderText() {
-      textDisplay.innerHTML = "";
-      for (let i = 0; i < text.length; i++) {
-        const span = document.createElement("span");
-        span.textContent = text[i];
-        if (i < currentIndex) {
-          span.className = inputField.value[i] === text[i] ? "correct" : "incorrect";
-        }
-        if (i === currentIndex) {
-          span.classList.add("current");
-        }
-        textDisplay.appendChild(span);
-      }
-    }
-
-    inputField.addEventListener("input", () => {
-      const value = inputField.value;
-      currentIndex = value.length;
-      renderText();
-    });
-
-    restartBtn.addEventListener("click", () => {
-      inputField.value = "";
-      currentIndex = 0;
-      renderText();
-      inputField.focus();
-    });
-
-    renderText();
-    inputField.focus();
-  </script>
+  <script src="{% static 'main/js/typer.js' %}"></script>
 </body>
 </html>
