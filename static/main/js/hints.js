@@ -1,5 +1,6 @@
 const hintsBox = document.getElementById("hintsBox");
 let hints = [];
+let context = {};
 let activeHintIndex = 0;
 
 async function getHints() {
@@ -23,10 +24,11 @@ async function getHints() {
         headers: {
             'Content-Type': 'application/json'
         },
-        body: JSON.stringify({ "word": word, "inputs": inputs })
+        body: JSON.stringify({ "word": word, "inputs": inputs, "context": context })
     })
     .then(response => response.json())
     .then(data => {
+        context = data.context;
         hints = data.hints.filter(h => h.startsWith(word));
         if (hints.length > 0) {
             activeHintIndex = 0;
