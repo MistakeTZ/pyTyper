@@ -4,6 +4,7 @@ from .models import Text
 import json
 from django.conf import settings
 from django.views.decorators.csrf import csrf_exempt
+from .pytext import get_attributes, custom_key
 
 def typer(request: HttpRequest):
     return render(request, 'main/typer.html')
@@ -22,7 +23,7 @@ def text(request: HttpRequest):
 @csrf_exempt
 def hints(request: HttpRequest):
     hints = []
-    context = {"i": "int", "f": "float", "s": "str", "b": "bool", "l": "list", "d": "dict"}
+    context = {"i": "int", "f": "float", "s": "str", "b": "bool", "l": "list", "d": "dict", "dt": "datetime"}
     if request.method == "POST":
         try:
             data = json.loads(request.body.decode("utf-8"))
@@ -45,26 +46,11 @@ def hints(request: HttpRequest):
             if before_point in context:
                 cont = context[before_point]
                 after_point = word[word.index(".") + 1:]
-                if cont == "int":
-                    hints.extend([before_point + "." + hint for hint in dir(int) if hint.startswith(after_point)])
-                elif cont == "str":
-                    hints.extend([before_point + "." + hint for hint in dir(str) if hint.startswith(after_point)])
-                elif cont == "bool":
-                    hints.extend([before_point + "." + hint for hint in dir(bool) if hint.startswith(after_point)])
-                elif cont == "float":
-                    hints.extend([before_point + "." + hint for hint in dir(float) if hint.startswith(after_point)])
-                elif cont == "list":
-                    hints.extend([before_point + "." + hint for hint in dir(list) if hint.startswith(after_point)])
-                elif cont == "dict":
-                    hints.extend([before_point + "." + hint for hint in dir(dict) if hint.startswith(after_point)])
+                hints.extend([before_point + "." + hint for
+                    hint in get_attributes(cont) if hint.startswith(after_point)])
             
             hints = [hint.strip("\n") for hint in hints if hint.startswith(word)]
         except Exception as e:
             print(e)
 
     return JsonResponse({"hints": sorted(list(set(hints)), key=custom_key), "context": context})
-
-
-def custom_key(s):
-    # Заменяем символ _ на символ с очень высоким Unicode-кодом для сортировки
-    return s.replace('_', chr(0x10FFFF))
