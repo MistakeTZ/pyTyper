@@ -10,15 +10,30 @@ async function getHints() {
         return;
     }
 
-    // Примерные подсказки — замени на реальный источник
-    const sample = ["лиса", "лист", "линия", "лишний"];
-    hints = sample.filter(h => h.startsWith(word));
+    hints = hints.filter(h => h.startsWith(word));
 
     if (hints.length > 0) {
         showHints();
     } else {
         hideHints();
     }
+
+    await fetch('/api/hints', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ "word": word, "inputs": inputs })
+    })
+    .then(response => response.json())
+    .then(data => {
+        hints = data.hints.filter(h => h.startsWith(word));
+        if (hints.length > 0) {
+            activeHintIndex = 0;
+            showHints();
+        }
+    })
+    .catch(error => console.error(error));
 }
 
 function showHints() {
@@ -51,7 +66,7 @@ function hideHints() {
 function selectHint(index) {
     const words = currentInput.split(" ");
     words[words.length - 1] = hints[index]; // заменяем последнее слово
-    const newInput = words.join(" ") + " ";
+    const newInput = words.join(" ");
     inputField.value = newInput;
     currentInput = newInput;
     inputs[currentLine] = currentInput;

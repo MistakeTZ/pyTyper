@@ -41,10 +41,18 @@ function renderText() {
         if (index === currentLine || index === currentLine - 1) {
             for (let i = 0; i < line.length; i++) {
                 const span = document.createElement("span");
-                span.textContent = line[i];
                 if (i < input.length) {
-                    span.className = input[i] === line[i] ? "correct" : "incorrect";
+                    span.textContent = input[i];
+                    if (input[i] !== line[i]) {
+                        if (input[i] === " ") span.textContent = "_";
+                        span.className = "incorrect";
+                    } else {
+                        span.className = "correct";
+                    }
+                } else {
+                    span.textContent = line[i];
                 }
+
                 if (index === currentLine - 1 && i === input.length) {
                     span.className = "incorrect";
                 }
@@ -61,11 +69,15 @@ function renderText() {
     }
 }
 
-inputField.addEventListener("input", async () => {
+inputField.addEventListener("input", async (e) => {
     currentInput = inputField.value;
     inputs[currentLine] = currentInput;
     renderText();
-    await getHints();
+    if (e.data !== " ") {
+        await getHints();
+    } else {
+        hideHints();
+    }
 });
 
 inputField.addEventListener("keydown", (e) => {
@@ -82,8 +94,15 @@ inputField.addEventListener("keydown", (e) => {
             activeHintIndex = (activeHintIndex - 1 + hints.length) % hints.length;
             showHints();
         }
+    } else if (e.key === "Tab") {
+        inputField.value += "    ";
+        e.preventDefault();
+        currentInput = inputField.value;
+        inputs[currentLine] = currentInput;
+        renderText();
+        hideHints();
     }
-
+    
     if (e.key === "Enter") {
         if (e.ctrlKey) {
             // TODO: end typing
@@ -99,6 +118,7 @@ inputField.addEventListener("keydown", (e) => {
             return;
         }
 
+        hideHints();
         renderText();
         e.preventDefault();
     }
