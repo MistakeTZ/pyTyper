@@ -14,13 +14,13 @@ body {
     font-size: 1.5rem;
     max-width: 800px;
     margin-bottom: 2rem;
-    line-height: 2.5rem;
+    line-height: 2rem;
     white-space: pre-wrap;
 }
 
 .line {
     display: block;
-    margin-bottom: 0.5rem;
+    margin-bottom: 0.2rem;
 }
 
 .correct {
