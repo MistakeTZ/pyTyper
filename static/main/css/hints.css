@@ -1,0 +1,20 @@
+#hintsBox {
+  background: #1f2937;
+  color: white;
+  font-family: 'Fira Code', monospace;
+  font-size: 1rem;
+  border: 1px solid #4b5563;
+  border-radius: 5px;
+  padding: 0.25rem 0;
+  z-index: 100;
+  box-shadow: 0 5px 10px rgba(0,0,0,0.3);
+}
+
+.hint {
+  padding: 0.25rem 1rem;
+  cursor: pointer;
+}
+
+.hint.active {
+  background: #374151;
+}

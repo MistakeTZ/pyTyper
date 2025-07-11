@@ -4,9 +4,10 @@ const restartBtn = document.getElementById("restartBtn");
 const newTextBtn = document.getElementById("newTextBtn");
 
 let text = ["Быстрая коричневая лиса", "перепрыгнула через ленивую собаку", "и скрылась в лесу."];
+let currentInput = "";
+
 let inputs = [];
 let currentLine = 0;
-let currentInput = "";
 
 function newText() {
     fetch("http://127.0.0.1:8000/text", {
@@ -60,14 +61,34 @@ function renderText() {
     }
 }
 
-inputField.addEventListener("input", () => {
+inputField.addEventListener("input", async () => {
     currentInput = inputField.value;
     inputs[currentLine] = currentInput;
     renderText();
+    await getHints();
 });
 
 inputField.addEventListener("keydown", (e) => {
+    if (hints.length > 0) {
+        if (e.key === "Tab") {
+            e.preventDefault();
+            selectHint(activeHintIndex);
+        } else if (e.key === "ArrowDown") {
+            e.preventDefault();
+            activeHintIndex = (activeHintIndex + 1) % hints.length;
+            showHints();
+        } else if (e.key === "ArrowUp") {
+            e.preventDefault();
+            activeHintIndex = (activeHintIndex - 1 + hints.length) % hints.length;
+            showHints();
+        }
+    }
+
     if (e.key === "Enter") {
+        if (e.ctrlKey) {
+            // TODO: end typing
+            return;
+        }
         currentLine++;
         currentInput = "";
         inputField.value = "";
