@@ -4,7 +4,7 @@ from .models import Text
 import json
 from django.conf import settings
 from django.views.decorators.csrf import csrf_exempt
-from .pytext import get_attributes, custom_key
+from .pytext import get_attributes, custom_key, get_context
 
 def typer(request: HttpRequest):
     return render(request, 'main/typer.html')
@@ -23,17 +23,22 @@ def text(request: HttpRequest):
 @csrf_exempt
 def hints(request: HttpRequest):
     hints = []
-    context = {"i": "int", "f": "float", "s": "str", "b": "bool", "l": "list", "d": "dict", "dt": "datetime"}
     if request.method == "POST":
         try:
             data = json.loads(request.body.decode("utf-8"))
             words = [word for word in data.get("inputs") if word]
             line = words[-1].split()
             word = data.get("word")
-            # context = data.get("context")
+            if "(" in word:
+                word = word.split("(")[-1]
+            context = get_context(words[:-1])
 
             before_point = word.split(".")[0] if "." in word else None
             
+            for key in context:
+                if key.startswith(word):
+                    hints.append(key)
+
             with open(settings.BASE_DIR / "static/main/hints/basic.txt", "r") as f:
                 hints.extend(f.readlines())
             if len(line) >= 2:

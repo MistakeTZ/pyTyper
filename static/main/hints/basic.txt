@@ -34,4 +34,4 @@ raise
 with
 async
 await
-yield
+open

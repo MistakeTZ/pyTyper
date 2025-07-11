@@ -6,12 +6,14 @@ let activeHintIndex = 0;
 async function getHints() {
     // пример — можно заменить на fetch по API
     const word = currentInput.trim().split(" ").pop();
-    if (!word) {
+    let splitted = word.split("(")[word.split("(").length - 1];
+    splitted = splitted.split("=")[word.split("=").length - 1];
+    if (!splitted) {
         hideHints();
         return;
     }
 
-    hints = hints.filter(h => h.startsWith(word));
+    hints = hints.filter(h => h.startsWith(splitted));
 
     if (hints.length > 0) {
         showHints();
@@ -29,7 +31,7 @@ async function getHints() {
     .then(response => response.json())
     .then(data => {
         context = data.context;
-        hints = data.hints.filter(h => h.startsWith(word));
+        hints = data.hints.filter(h => h.startsWith(splitted));
         if (hints.length > 0) {
             activeHintIndex = 0;
             showHints();
@@ -67,7 +69,14 @@ function hideHints() {
 
 function selectHint(index) {
     const words = currentInput.split(" ");
-    words[words.length - 1] = hints[index]; // заменяем последнее слово
+
+    if (words[words.length - 1].includes("(")) {
+        words[words.length - 1] = words[words.length - 1].split("(")[0] + "(" + hints[index];
+    } else if (words[words.length - 1].includes("=")) {
+        words[words.length - 1] = words[words.length - 1].split("=")[0] + "=" + hints[index];
+    } else {
+        words[words.length - 1] = hints[index]; // заменяем последнее слово
+    }
     const newInput = words.join(" ");
     inputField.value = newInput;
     currentInput = newInput;
