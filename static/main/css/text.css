@@ -13,6 +13,7 @@ body {
 #textContainer {
     font-size: 1.5rem;
     max-width: 800px;
+    min-width: 50%;
     margin-bottom: 2rem;
     line-height: 2rem;
     white-space: pre-wrap;
