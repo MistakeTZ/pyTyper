@@ -9,3 +9,13 @@ class Text(models.Model):
 
     def __str__(self):
         return self.text
+
+
+class Test(models.Model):
+    text = models.ForeignKey(Text, on_delete=models.SET_NULL, null=True)
+    user = models.ForeignKey("auth.User", on_delete=models.CASCADE)
+    wpm = models.IntegerField(default=0)
+    accuracy = models.FloatField(default=0.0)
+    time = models.IntegerField(default=0)
+    created_at = models.DateTimeField(auto_now_add=True)
+    complete = models.BooleanField(default=False)

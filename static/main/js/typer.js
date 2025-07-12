@@ -4,18 +4,22 @@ const restartBtn = document.getElementById("restartBtn");
 const newTextBtn = document.getElementById("newTextBtn");
 
 let text = ["Быстрая коричневая лиса", "перепрыгнула через ленивую собаку", "и скрылась в лесу."];
-let currentInput = "";
+let test_id = 0;
 
+let currentInput = "";
 let inputs = [];
 let currentLine = 0;
 
+
 function newText() {
-    fetch("http://127.0.0.1:8000/text", {
+    fetch("/text", {
         method: "POST",
     })
     .then(response => response.json())
     .then(data => {
         text = data.text;
+        test_id = data.test_id;
+
         inputs = Array(text.length).fill(""); // сбрасываем ввод
         currentLine = 0;
         currentInput = "";
@@ -24,6 +28,28 @@ function newText() {
     })
     .catch(error => console.error(error));
 }
+
+
+function endTest() {
+    fetch("/end", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+            "test_id": test_id,
+            "inputs": inputs,
+            "start_time": startTime,
+            "end_time": Date.now()
+        }),
+    })
+    .then(response => response.json())
+    .then(data => {
+        console.log(data);
+    })
+    .catch(error => console.error(error));
+}
+
 
 function renderText() {
     textContainer.innerHTML = "";
@@ -126,7 +152,7 @@ inputField.addEventListener("keydown", (e) => {
         }
     } else if (e.key === "Enter") {
         if (e.ctrlKey) {
-            // TODO: end typing
+            endTest();
             return;
         }
         let tabs = 0;
@@ -146,8 +172,7 @@ inputField.addEventListener("keydown", (e) => {
         inputs[currentLine] = currentInput;
 
         if (currentLine >= text.length) {
-            alert("Готово!");
-            inputField.blur();
+            endTest();
             return;
         }
 

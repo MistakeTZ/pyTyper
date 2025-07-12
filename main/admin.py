@@ -3,3 +3,4 @@ from .models import *
 
 
 admin.site.register(Text)
+admin.site.register(Test)

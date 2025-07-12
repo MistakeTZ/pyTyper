@@ -1,0 +1,36 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Результаты теста</title>
+    <link href="https://fonts.googleapis.com/css2?family=Fira+Code&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'main/css/result.css' %}">
+</head>
+<body>
+    <div class="result-container">
+        <h1 style="margin-bottom: 1rem;">Результаты теста</h1>
+
+        <div class="result-info">
+            <p><strong>Язык программирования:</strong> {{ programmin_language |default:"Python" }}</p>
+            <p><strong>Источник:</strong> <a href="{{ source_url }}" target="_blank" style="color: #60a5fa;">{{ source_url }}</a></p>
+        </div>
+
+        <div class="result-stats">
+            <p><strong>Скорость:</strong> {{ wpm }} слов/мин</p>
+            <p><strong>Точность:</strong> {{ accuracy }}%</p>
+            <p><strong>Время:</strong> {{ duration }} сек</p>
+        </div>
+
+        <div class="result-text">
+            <h3>Текст</h3>
+            <p>{{ full_text }}</p>
+        </div>
+
+        <div>
+            <button id="restartBtn" onclick="window.location.href=''">Переиграть</button>
+            <button id="newTextBtn" onclick="window.location.href=''">Новый текст</button>
+        </div>
+    </div>
+</body>
+</html>
