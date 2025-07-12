@@ -121,15 +121,29 @@ inputField.addEventListener("keydown", (e) => {
                 renderText();
             }
             return;
+        } else if (inputField.value.endsWith("    ")) {
+            inputField.value = inputField.value.slice(0, -3);
         }
     } else if (e.key === "Enter") {
         if (e.ctrlKey) {
             // TODO: end typing
             return;
         }
+        let tabs = 0;
+        for (let i = 0; i < currentInput.length; i++) {
+            if (currentInput[i] === " ") {
+                tabs++;
+            } else {
+                break;
+            }
+        }
+        if (currentInput.trim().endsWith(":")) {
+            tabs += 4;
+        }
         currentLine++;
-        currentInput = "";
-        inputField.value = "";
+        currentInput = " ".repeat(tabs);
+        inputField.value = currentInput;
+        inputs[currentLine] = currentInput;
 
         if (currentLine >= text.length) {
             alert("Готово!");
