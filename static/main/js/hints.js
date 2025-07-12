@@ -8,12 +8,21 @@ async function getHints() {
     const word = currentInput.trim().split(" ").pop();
     let splitted = word.split("(")[word.split("(").length - 1];
     splitted = splitted.split("=")[word.split("=").length - 1];
-    if (!splitted) {
+    if (!splitted && splitted === word) {
         hideHints();
         return;
     }
+    let afterDot = null;
+    const dotCount = splitted.split(".").length - 1;
+    if (dotCount) {
+        afterDot = splitted.split(".")[dotCount];
+    }
 
-    hints = hints.filter(h => h.startsWith(splitted));
+    if (afterDot) {
+        hints = hints.filter(h => h.startsWith(afterDot));
+    } else {
+        hints = hints.filter(h => h.startsWith(splitted));
+    }
 
     if (hints.length > 0) {
         showHints();
@@ -26,12 +35,16 @@ async function getHints() {
         headers: {
             'Content-Type': 'application/json'
         },
-        body: JSON.stringify({ "word": word, "inputs": inputs, "context": context })
+        body: JSON.stringify({ inputs })
     })
     .then(response => response.json())
     .then(data => {
-        context = data.context;
-        hints = data.hints.filter(h => h.startsWith(splitted));
+        if (afterDot !== null) {
+            hints = data.hints.filter(h => h.startsWith(afterDot));
+        } else {
+            hints = data.hints.filter(h => h.startsWith(splitted));
+        }
+
         if (hints.length > 0) {
             activeHintIndex = 0;
             showHints();
@@ -69,14 +82,17 @@ function hideHints() {
 
 function selectHint(index) {
     const words = currentInput.split(" ");
+    const word = words[words.length - 1];
+    let lastIndex = -1;
 
-    if (words[words.length - 1].includes("(")) {
-        words[words.length - 1] = words[words.length - 1].split("(")[0] + "(" + hints[index];
-    } else if (words[words.length - 1].includes("=")) {
-        words[words.length - 1] = words[words.length - 1].split("=")[0] + "=" + hints[index];
-    } else {
-        words[words.length - 1] = hints[index]; // заменяем последнее слово
-    }
+    ["(", "=", "."].forEach(symbol => {
+        if (word.includes(symbol)) {
+            lastIndex = Math.max(lastIndex, word.lastIndexOf(symbol));
+        }
+    })
+
+    words[words.length - 1] = word.substring(0, lastIndex + 1) + hints[index];
+
     const newInput = words.join(" ");
     inputField.value = newInput;
     currentInput = newInput;

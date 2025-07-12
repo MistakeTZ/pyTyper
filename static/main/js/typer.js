@@ -39,7 +39,7 @@ function renderText() {
         const input = inputs[index] || "";
 
         if (index === currentLine || index === currentLine - 1) {
-            for (let i = 0; i < line.length; i++) {
+            for (let i = 0; i < Math.max(line.length, input.length + 1); i++) {
                 const span = document.createElement("span");
                 if (i < input.length) {
                     span.textContent = input[i];
@@ -58,6 +58,7 @@ function renderText() {
                 }
                 if (index === currentLine && i === input.length) {
                     span.classList.add("current");
+                    span.textContent = span.textContent || " ";
                 }
                 lineDiv.appendChild(span);
             }
