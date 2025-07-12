@@ -12,10 +12,12 @@
   <div id="textContainer"></div>
   <div id="hintsBox" style="position: absolute; display: none;"></div>
   <input type="text" id="inputField" autofocus />
+  <div id="wpmDisplay">Скорость: 0 WPM</div>
   <div class="container">
     <button id="restartBtn">Restart</button>
     <button id="newTextBtn">New Text</button>
   </div>
+  <script src="{% static 'main/js/wpm.js' %}"></script>
   <script src="{% static 'main/js/hints.js' %}"></script>
   <script src="{% static 'main/js/typer.js' %}"></script>
 </body>

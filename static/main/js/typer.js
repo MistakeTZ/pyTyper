@@ -58,7 +58,7 @@ function renderText() {
                 }
                 if (index === currentLine && i === input.length) {
                     span.classList.add("current");
-                    span.textContent = span.textContent || " ";
+                    span.textContent = line[i] && line[i].trim() ? line[i] : " ";
                 }
                 lineDiv.appendChild(span);
             }
@@ -71,8 +71,15 @@ function renderText() {
 }
 
 inputField.addEventListener("input", async (e) => {
+    if (!startTime) {
+        startTime = Date.now();
+        wpmInterval = setInterval(updateWPM, 1000);
+    }
+
     currentInput = inputField.value;
     inputs[currentLine] = currentInput;
+    totalTypedChars = inputs.reduce((sum, line) => sum + line.length, 0);
+
     renderText();
     if (e.data !== " ") {
         await getHints();
@@ -104,7 +111,18 @@ inputField.addEventListener("keydown", (e) => {
         hideHints();
     }
     
-    if (e.key === "Enter") {
+    if (e.key === "Backspace") {
+        if (inputField.value === "") {
+            e.preventDefault();
+            if (currentLine > 0) {
+                currentLine--;
+                inputField.value = inputs[currentLine] || "";
+                currentInput = inputField.value;
+                renderText();
+            }
+            return;
+        }
+    } else if (e.key === "Enter") {
         if (e.ctrlKey) {
             // TODO: end typing
             return;
@@ -126,6 +144,11 @@ inputField.addEventListener("keydown", (e) => {
 });
 
 restartBtn.addEventListener("click", () => {
+    startTime = null;
+    totalTypedChars = 0;
+    clearInterval(wpmInterval);
+    document.getElementById("wpmDisplay").textContent = "Скорость: 0 WPM";
+
     inputField.value = "";
     currentLine = 0;
     currentInput = "";
