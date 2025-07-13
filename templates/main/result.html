@@ -14,7 +14,7 @@
 
         <div class="result-info">
             <p><strong>Язык программирования:</strong> {{ programming_language }}</p>
-            <p><strong>Источник:</strong> <a href="{{ source_url }}" target="_blank" style="color: #60a5fa;">{{ source_url }}</a></p>
+            <p><strong>Источник:</strong> <a href="{{ source_url }}" {% if source_url != "#" %}target="_blank"{% endif %} style="color: #60a5fa;">{{ source }}</a></p>
         </div>
 
         <div class="result-stats">

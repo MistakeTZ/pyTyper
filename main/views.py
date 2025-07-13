@@ -5,8 +5,10 @@ import json
 from django.views.decorators.csrf import csrf_exempt
 import jedi
 import subprocess
+from .ts_lsp_client import TypeScriptLSP
 
-
+lsp = TypeScriptLSP()
+lsp.initialize()
 tests = []
 
 def typer(request: HttpRequest):
@@ -62,18 +64,13 @@ def hints(request: HttpRequest):
             completions = script.complete(line=line_number, column=column)
             suggestions = [c.name for c in completions]
         elif lang == "js":
-            proc = subprocess.Popen(
-                ['node', 'js/js_parser.js'],
-                stdin=subprocess.PIPE,
-                stdout=subprocess.PIPE,
-                stderr=subprocess.PIPE
-            )
-            stdout, stderr = proc.communicate(full_code.encode('utf-8'))
-            if proc.returncode != 0:
-                suggestions = []
-            else:
-                res = json.loads(stdout.decode('utf-8'))
-                suggestions = res
+            line_number = len(lines) - 1
+            column = len(lines[-1])
+            result = lsp.get_completions(full_code, line_number, column)
+
+            suggestions = []
+            if result and 'items' in result:
+                suggestions = [item['label'] for item in result['items']]
 
         return JsonResponse({'hints': suggestions})
     except Exception as e:
@@ -127,7 +124,8 @@ def result(request: HttpRequest):
 
             context = {
                 "programming_language": test.text.programming_language,
-                "source_url": test.text.source,
+                "source": test.text.source,
+                "source_url": test.text.source_link or "#",
                 "wpm": round(wpm, 1),
                 "accuracy": round(accuracy * 100, 2),
                 "duration": round(time / 1000.0, 1),
