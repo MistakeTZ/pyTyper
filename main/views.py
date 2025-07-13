@@ -2,7 +2,6 @@ from django.shortcuts import render
 from django.http import HttpRequest, JsonResponse
 from .models import Text, Test
 import json
-from django.conf import settings
 from django.views.decorators.csrf import csrf_exempt
 import jedi
 
@@ -39,9 +38,13 @@ def text(request: HttpRequest):
 
 @csrf_exempt
 def hints(request: HttpRequest):
-    if request.method == "POST":
-        data = json.loads(request.body.decode("utf-8"))
-        lines = [line for line in data.get("inputs") if line]
+    if request.method != "POST":
+        return JsonResponse({"error": "Request method is not POST"}, status=400)
+
+    try:
+        data = json.loads(request.body)  # Или request.json() в Django 3.1+
+        inputs = data.get("inputs", [])
+        lines = [line for line in inputs if line]
 
         if not lines:
             return JsonResponse({'hints': []})
@@ -52,12 +55,12 @@ def hints(request: HttpRequest):
         column = len(current_line)
         script = jedi.Script(code=full_code)
 
-        completions =   script.complete(line=line_number, column=column)
+        completions = script.complete(line=line_number, column=column)
         suggestions = [c.name for c in completions]
 
         return JsonResponse({'hints': suggestions})
-
-    return JsonResponse({"error": "Request method is not POST"}, status=400)
+    except Exception as e:
+        return JsonResponse({"error": str(e)}, status=500)
 
 
 def result(request: HttpRequest):
@@ -77,7 +80,7 @@ def result(request: HttpRequest):
 
             for i in range(len(text_lines)):
                 text_line = text_lines[i]
-                total += len(text_lines) + 1
+                total += len(text_line) + 1
 
                 if len(lines) <= i:
                     full_text += line + "\n"
@@ -101,7 +104,7 @@ def result(request: HttpRequest):
                 full_text += "\n"
                 correct += 1
 
-            accuracy = correct / total
+            accuracy = (correct - 1) / total
             time = body.get("end_time") - body.get("start_time")
             wpm = (correct + incorrect) / 5 / (time / 60000)
 
