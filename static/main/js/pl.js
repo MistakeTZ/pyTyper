@@ -1,23 +1,38 @@
+// Enhanced dropdown functionality
 const selected = document.getElementById('selected');
 const options = document.getElementById('options');
 
 selected.addEventListener('click', () => {
-  options.style.display = options.style.display === 'block' ? 'none' : 'block';
-  inputField.focus();
+    options.classList.toggle('show');
+    selected.classList.toggle('active');
 });
 
-options.querySelectorAll('.option').forEach(opt => {
-  opt.addEventListener('mousedown', () => {
-    selected.textContent = opt.textContent;
-    selected.dataset.value = opt.dataset.value;
-    options.style.display = 'none';
-    restartTest(false);
-  });
+document.addEventListener('click', (e) => {
+    if (!document.getElementById('programmingLanguage').contains(e.target)) {
+        options.classList.remove('show');
+        selected.classList.remove('active');
+    }
 });
 
-document.addEventListener('click', e => {
-  if (!document.getElementById('programmingLanguage').contains(e.target)) {
-    options.style.display = 'none';
-    inputField.focus();
-  }
+// Option selection
+document.querySelectorAll('.option').forEach(option => {
+    option.addEventListener('click', () => {
+        selected.textContent = option.textContent;
+        options.classList.remove('show');
+        selected.classList.remove('active');
+        
+        // Update selected state
+        document.querySelectorAll('.option').forEach(opt => opt.classList.remove('selected'));
+        option.classList.add('selected');
+
+        restartTest(false);
+    });
+});
+
+// Focus management
+document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') {
+        options.classList.remove('show');
+        selected.classList.remove('active');
+    }
 });

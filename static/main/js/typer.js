@@ -195,7 +195,7 @@ function restartTest(sameText=false) {
     totalTypedChars = 0;
     clearInterval(wpmInterval);
     document.getElementById("wpmDisplay").textContent = "Скорость: 0 WPM";
-    let lang = document.getElementById("selected").dataset.value;
+    let lang = document.getElementById("selected").textContent.toLowerCase();
 
     newText(sameText ? test_id : null, lang);
     renderText();
@@ -205,12 +205,17 @@ restartBtn.addEventListener("click", () => restartTest(true));
 
 newTextBtn.addEventListener("click", () => restartTest(false));
 
-inputField.addEventListener('blur', () => {
-    setTimeout(() => inputField.focus(), 0);
-});
-
 document.addEventListener("DOMContentLoaded", () => {
     let test = document.querySelector("meta[name=test-id]");
     newText(test.content, "python");
     inputField.focus();
+});
+
+// Auto-focus input field
+document.addEventListener('click', (e) => {
+    if (!['INPUT', 'BUTTON'].includes(e.target.tagName) && 
+        !e.target.closest('#programmingLanguage') && 
+        !e.target.closest('#hintsBox')) {
+    document.getElementById('inputField').focus();
+    }
 });

@@ -4,7 +4,6 @@ from .models import Text, Test
 import json
 from django.views.decorators.csrf import csrf_exempt
 import jedi
-import subprocess
 from .ts_lsp_client import TypeScriptLSP
 
 lsp = TypeScriptLSP()
@@ -33,6 +32,7 @@ def text(request: HttpRequest):
         if lang is None or lang == "random":
             text = Text.objects.order_by('?')[0]
         else:
+            if lang == "javascript": lang = "js"
             text = Text.objects.filter(programming_language=lang).order_by('?')[0]
     test = Test.objects.create(text=text, user=request.user)
 
@@ -108,14 +108,14 @@ def result(request: HttpRequest):
                 line = lines[i]
                 for c in range(len(line)):
                     if len(text_line) <= c:
-                        full_text += "<span class='incorrect'>" + line[c:] + "</span>\n"
+                        full_text += "<span-class='incorrect'>" + line[c:] + "</span>\n"
                         break
 
                     if line[c] == text_line[c]:
-                        full_text += "<span class='correct'>" + line[c] + "</span>"
+                        full_text += "<span-class='correct'>" + line[c] + "</span>"
                         correct += 1
                     else:
-                        full_text += "<span class='incorrect'>" + line[c] + "</span>"
+                        full_text += "<span-class='incorrect'>" + line[c] + "</span>"
                         incorrect += 1
                 
                 if len(line) < len(text_line):
@@ -135,7 +135,8 @@ def result(request: HttpRequest):
                 "wpm": round(wpm, 1),
                 "accuracy": round(accuracy * 100, 2),
                 "duration": round(time / 1000.0, 1),
-                "full_text": full_text,
+                "full_text": full_text.replace("\n", "<br>").replace(" ",
+                            "&nbsp;").replace("span-class", "span class"),
                 "test_id": test.id
             }
 

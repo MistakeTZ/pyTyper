@@ -7,17 +7,15 @@
   <meta name="csrf-token" content="{{ csrf_token }}">
   <meta name="test-id" content="{{ test_id }}">
   <title>Typing Trainer</title>
-  <link rel="stylesheet" href="{% static 'main/css/text.css' %}">
-  <link rel="stylesheet" href="{% static 'main/css/hints.css' %}">
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{% static 'main/css/typer.css' %}">
 </head>
 <body>
-  <div class="container" style="display: flex; gap: 20px; align-items: flex-start; margin-bottom: 20px;">
+  <div class="header">
     <div id="wpmDisplay">WPM: 0</div>
-
+    
     <div id="programmingLanguage">
       <div id="selected">Python</div>
-      
-      <!-- options: absolute position, fixed size, no layout shift -->
       <div id="options">
         <div class="option" data-value="python">Python</div>
         <div class="option" data-value="js">JavaScript</div>
@@ -25,13 +23,16 @@
       </div>
     </div>
   </div>
+
   <div id="textContainer"></div>
-  <div id="hintsBox" style="position: absolute; display: none;"></div>
+  <div id="hintsBox"></div>
   <input type="text" id="inputField" autofocus />
-  <div class="container">
-    <button id="restartBtn">Restart</button>
-    <button id="newTextBtn">New Text</button>
+  
+  <div class="button-group">
+    <button id="restartBtn" class="btn btn-primary">Restart</button>
+    <button id="newTextBtn" class="btn">New Text</button>
   </div>
+
   <script src="{% static 'main/js/wpm.js' %}"></script>
   <script src="{% static 'main/js/pl.js' %}"></script>
   <script src="{% static 'main/js/hints.js' %}"></script>

@@ -5,29 +5,47 @@
     <meta charset="UTF-8">
     <meta name="csrf-token" content="{{ csrf_token }}">
     <title>Test results</title>
-    <link href="https://fonts.googleapis.com/css2?family=Fira+Code&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="{% static 'main/css/result.css' %}">
 </head>
 <body>
     <div class="result-container">
-        <h1 style="margin-bottom: 1rem;">Test results</h1>
+        <h1>Test Results</h1>
 
         <div class="result-info">
             <p><strong>Programming language:</strong> {{ programming_language }}</p>
-            <p><strong>Source:</strong> <a href="{{ source_url }}" {% if source_url != "#" %}target="_blank"{% endif %} style="color: #60a5fa;">{{ source }}</a></p>
+            <p><strong>Source:</strong> <a href="{{ source_url }}" {% if source_url != "#" %}target="_blank"{% endif %}>{{ source }}</a></p>
         </div>
 
         <div class="result-stats">
-            <p><strong>WPM:</strong> {{ wpm }}</p>
-            <p><strong>Accuracy:</strong> {{ accuracy }}%</p>
-            <p><strong>Duration:</strong> {{ duration }} sec</p>
+            <div class="stat-card">
+                <div class="stat-value">{{ wpm }}</div>
+                <div class="stat-label">WPM</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value">{{ accuracy }}%</div>
+                <div class="stat-label">Accuracy</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value">{{ duration }}s</div>
+                <div class="stat-label">Duration</div>
+            </div>
         </div>
 
-        <div class="result-text"><h3>Text</h3><p>{{ full_text|safe }}</p></div>
+        <div class="result-text">
+            <h3>Text</h3>
+            <p>{{ full_text|safe }}</p>
+        </div>
 
-        <div>
-            <a href="/?test_id={{ test_id }}"><button id="restartBtn">Restart</button></a>
-            <a href="/"><button id="newTextBtn">New Text</button></a>
+        <div class="button-group">
+            <a href="/?test_id={{ test_id }}" class="btn btn-primary">
+                <span>↻</span>
+                Restart
+            </a>
+            <a href="/" class="btn">
+                <span>+</span>
+                New Text
+            </a>
         </div>
     </div>
 </body>
