@@ -39,6 +39,10 @@ async function getHints() {
     })
     .then(response => response.json())
     .then(data => {
+        if (data.error) {
+            console.error(data.error);
+            return;
+        }
         if (afterDot !== null) {
             hints = data.hints.filter(h => h.startsWith(afterDot));
         } else {

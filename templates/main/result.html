@@ -12,7 +12,7 @@
         <h1 style="margin-bottom: 1rem;">Результаты теста</h1>
 
         <div class="result-info">
-            <p><strong>Язык программирования:</strong> {{ programmin_language |default:"Python" }}</p>
+            <p><strong>Язык программирования:</strong> {{ programmin_language }}</p>
             <p><strong>Источник:</strong> <a href="{{ source_url }}" target="_blank" style="color: #60a5fa;">{{ source_url }}</a></p>
         </div>
 
@@ -22,9 +22,7 @@
             <p><strong>Время:</strong> {{ duration }} сек</p>
         </div>
 
-        <div class="result-text">
-            <h3>Текст</h3>
-            <p>{{ full_text }}</p>
+        <div class="result-text"><h3>Текст</h3><p>{{ full_text }}</p>
         </div>
 
         <div>

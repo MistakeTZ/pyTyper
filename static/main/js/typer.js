@@ -35,6 +35,7 @@ function endTest() {
         method: "POST",
         headers: {
             "Content-Type": "application/json",
+            "X-CSRFToken": document.querySelector("meta[name=csrf-token]").getAttribute("content"),
         },
         body: JSON.stringify({
             "test_id": test_id,
@@ -43,9 +44,9 @@ function endTest() {
             "end_time": Date.now()
         }),
     })
-    .then(response => response.json())
-    .then(data => {
-        console.log(data);
+    .then(response => response.text())
+    .then(html => {
+        document.body.innerHTML = html;
     })
     .catch(error => console.error(error));
 }
