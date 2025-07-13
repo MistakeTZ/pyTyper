@@ -4,6 +4,7 @@ from .models import Text, Test
 import json
 from django.views.decorators.csrf import csrf_exempt
 import jedi
+import subprocess
 
 
 tests = []
@@ -42,8 +43,9 @@ def hints(request: HttpRequest):
         return JsonResponse({"error": "Request method is not POST"}, status=400)
 
     try:
-        data = json.loads(request.body)  # Или request.json() в Django 3.1+
+        data = json.loads(request.body)
         inputs = data.get("inputs", [])
+        lang = data.get("lang", "python")
         lines = [line for line in inputs if line]
 
         if not lines:
@@ -51,12 +53,27 @@ def hints(request: HttpRequest):
 
         current_line = lines[-1]
         full_code = '\n'.join(lines)
-        line_number = len(lines)
-        column = len(current_line)
-        script = jedi.Script(code=full_code)
 
-        completions = script.complete(line=line_number, column=column)
-        suggestions = [c.name for c in completions]
+        if lang == "python":
+            line_number = len(lines)
+            column = len(current_line)
+            script = jedi.Script(code=full_code)
+
+            completions = script.complete(line=line_number, column=column)
+            suggestions = [c.name for c in completions]
+        elif lang == "js":
+            proc = subprocess.Popen(
+                ['node', 'js/js_parser.js'],
+                stdin=subprocess.PIPE,
+                stdout=subprocess.PIPE,
+                stderr=subprocess.PIPE
+            )
+            stdout, stderr = proc.communicate(full_code.encode('utf-8'))
+            if proc.returncode != 0:
+                suggestions = []
+            else:
+                res = json.loads(stdout.decode('utf-8'))
+                suggestions = res
 
         return JsonResponse({'hints': suggestions})
     except Exception as e:

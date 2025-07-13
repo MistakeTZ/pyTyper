@@ -5,6 +5,7 @@ const newTextBtn = document.getElementById("newTextBtn");
 
 let text = ["Быстрая коричневая лиса", "перепрыгнула через ленивую собаку", "и скрылась в лесу."];
 let test_id = 0;
+let programming_language = "python";
 
 let currentInput = "";
 let inputs = [];
@@ -24,6 +25,7 @@ function newText(test) {
     .then(data => {
         text = data.text;
         test_id = data.test_id;
+        programming_language = data.programming_language;
 
         inputs = Array(text.length).fill(""); // сбрасываем ввод
         currentLine = 0;

@@ -35,7 +35,7 @@ async function getHints() {
         headers: {
             'Content-Type': 'application/json'
         },
-        body: JSON.stringify({ inputs })
+        body: JSON.stringify({ "inputs": inputs, "lang": programming_language })
     })
     .then(response => response.json())
     .then(data => {
