@@ -18,16 +18,22 @@ def typer(request: HttpRequest):
 
 def text(request: HttpRequest):
     text = None
+    lang = None
     if request.method == "POST":
         data = json.loads(request.body.decode("utf-8"))
         test_id = data.get("test_id")
+        lang = data.get("lang")
+
         if test_id and test_id != 'None':
             test = Test.objects.get(id=test_id)
             if test:
                 text = test.text
 
     if not text:
-        text = Text.objects.order_by('?')[0]
+        if lang is None or lang == "random":
+            text = Text.objects.order_by('?')[0]
+        else:
+            text = Text.objects.filter(programming_language=lang).order_by('?')[0]
     test = Test.objects.create(text=text, user=request.user)
 
     response = JsonResponse({

@@ -3,7 +3,7 @@ const textContainer = document.getElementById("textContainer");
 const restartBtn = document.getElementById("restartBtn");
 const newTextBtn = document.getElementById("newTextBtn");
 
-let text = ["Быстрая коричневая лиса", "перепрыгнула через ленивую собаку", "и скрылась в лесу."];
+let text = ["If you see this - then something went wrong"];
 let test_id = 0;
 let programming_language = "python";
 
@@ -12,14 +12,14 @@ let inputs = [];
 let currentLine = 0;
 
 
-function newText(test) {
+function newText(test, lang) {
     fetch("/text", {
         method: "POST",
         headers: {
             "Content-Type": "application/json",
             "X-CSRFToken": document.querySelector("meta[name=csrf-token]").getAttribute("content"),
         },
-        body: JSON.stringify({ "test_id": test }),
+        body: JSON.stringify({ "test_id": test, "lang": lang }),
     })
     .then(response => response.json())
     .then(data => {
@@ -195,18 +195,22 @@ function restartTest(sameText=false) {
     totalTypedChars = 0;
     clearInterval(wpmInterval);
     document.getElementById("wpmDisplay").textContent = "Скорость: 0 WPM";
+    let lang = document.getElementById("selected").dataset.value;
 
-    newText(sameText ? test_id : null);
+    newText(sameText ? test_id : null, lang);
     renderText();
-    inputField.focus();
 }
 
 restartBtn.addEventListener("click", () => restartTest(true));
 
 newTextBtn.addEventListener("click", () => restartTest(false));
 
+inputField.addEventListener('blur', () => {
+    setTimeout(() => inputField.focus(), 0);
+});
+
 document.addEventListener("DOMContentLoaded", () => {
     let test = document.querySelector("meta[name=test-id]");
-    newText(test.content);
+    newText(test.content, "python");
     inputField.focus();
 });

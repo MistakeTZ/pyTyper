@@ -9,5 +9,5 @@ function updateWPM() {
     const wordsTyped = totalTypedChars / 5;
     const wpm = Math.round(wordsTyped / elapsedMinutes);
 
-    document.getElementById("wpmDisplay").textContent = `Скорость: ${wpm} WPM`;
+    document.getElementById("wpmDisplay").textContent = `WPM: ${wpm}`;
 }

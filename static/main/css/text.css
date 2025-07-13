@@ -56,3 +56,31 @@ body {
     border-radius: 5px;
     cursor: pointer;
 }
+
+#options {
+    border-top:1px solid #ccc; 
+    position:absolute; 
+    top:100%; 
+    left:0; 
+    right:0; 
+    background:white; 
+    display:none; 
+    max-height:150px; 
+    overflow:auto;
+    z-index:100;
+}
+
+.option, #selected {
+    padding: 5px; 
+    cursor: pointer;
+    background-color: rgb(44, 44, 44);
+    color: white;
+    border: none;
+    text-align: left;
+}
+
+#programmingLanguage {
+    width:200px;
+    user-select: none;
+    position: relative;
+}
