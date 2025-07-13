@@ -11,9 +11,14 @@ let inputs = [];
 let currentLine = 0;
 
 
-function newText() {
+function newText(test) {
     fetch("/text", {
         method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+            "X-CSRFToken": document.querySelector("meta[name=csrf-token]").getAttribute("content"),
+        },
+        body: JSON.stringify({ "test_id": test }),
     })
     .then(response => response.json())
     .then(data => {
@@ -183,27 +188,23 @@ inputField.addEventListener("keydown", (e) => {
     }
 });
 
-restartBtn.addEventListener("click", () => {
+function restartTest(sameText=false) {
     startTime = null;
     totalTypedChars = 0;
     clearInterval(wpmInterval);
     document.getElementById("wpmDisplay").textContent = "Скорость: 0 WPM";
 
-    inputField.value = "";
-    currentLine = 0;
-    currentInput = "";
+    newText(sameText ? test_id : null);
     renderText();
     inputField.focus();
-});
+}
 
-newTextBtn.addEventListener("click", () => {
-    newText();
-    currentLine = 0;
-    currentInput = "";
-    inputField.focus();
-});
+restartBtn.addEventListener("click", () => restartTest(true));
+
+newTextBtn.addEventListener("click", () => restartTest(false));
 
 document.addEventListener("DOMContentLoaded", () => {
-    newText();
+    let test = document.querySelector("meta[name=test-id]");
+    newText(test.content);
     inputField.focus();
 });

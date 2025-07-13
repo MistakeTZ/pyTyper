@@ -10,45 +10,52 @@ import jedi
 tests = []
 
 def typer(request: HttpRequest):
-    return render(request, 'main/typer.html')
+    test_id = 0 or request.GET.get("test_id")
+    return render(request, 'main/typer.html', {"test_id": test_id})
 
 
-@csrf_exempt
 def text(request: HttpRequest):
-    text = Text.objects.order_by('?')[0]
+    text = None
+    if request.method == "POST":
+        data = json.loads(request.body.decode("utf-8"))
+        test_id = data.get("test_id")
+        if test_id and test_id != 'None':
+            test = Test.objects.get(id=test_id)
+            if test:
+                text = test.text
+
+    if not text:
+        text = Text.objects.order_by('?')[0]
     test = Test.objects.create(text=text, user=request.user)
 
-    return JsonResponse({
+    response = JsonResponse({
         "text": text.text.split("\n"),
         "id": text.id,
         "programming_language": text.programming_language,
         "test_id": test.id
     })
+    return response
 
 
 @csrf_exempt
 def hints(request: HttpRequest):
     if request.method == "POST":
-        try:
-            data = json.loads(request.body.decode("utf-8"))
-            lines = [line for line in data.get("inputs") if line]
+        data = json.loads(request.body.decode("utf-8"))
+        lines = [line for line in data.get("inputs") if line]
 
-            if not lines:
-                return JsonResponse({'hints': []})
+        if not lines:
+            return JsonResponse({'hints': []})
 
-            current_line = lines[-1]
-            full_code = '\n'.join(lines)
-            line_number = len(lines)
-            column = len(current_line)
-            script = jedi.Script(code=full_code)
+        current_line = lines[-1]
+        full_code = '\n'.join(lines)
+        line_number = len(lines)
+        column = len(current_line)
+        script = jedi.Script(code=full_code)
 
-            completions = script.complete(line=line_number, column=column)
-            suggestions = [c.name for c in completions]
+        completions =   script.complete(line=line_number, column=column)
+        suggestions = [c.name for c in completions]
 
-            return JsonResponse({'hints': suggestions})
-
-        except Exception as e:
-            return JsonResponse({'error': str(e)}, status=500)
+        return JsonResponse({'hints': suggestions})
 
     return JsonResponse({"error": "Request method is not POST"}, status=400)
 
@@ -66,24 +73,33 @@ def result(request: HttpRequest):
             correct = 0
             incorrect = 0
             total = -1
+            full_text = ""
 
             for i in range(len(text_lines)):
                 text_line = text_lines[i]
                 total += len(text_lines) + 1
 
                 if len(lines) <= i:
+                    full_text += line + "\n"
                     continue
                 line = lines[i]
                 for c in range(len(line)):
                     if len(text_line) <= c:
+                        full_text += "<span class='incorrect'>" + line[c:] + "</span>\n"
                         break
 
                     if line[c] == text_line[c]:
+                        full_text += "<span class='correct'>" + line[c] + "</span>"
                         correct += 1
-                        if len(line) == c + 1 and len(lines) != i + 1:
-                            correct += 1
                     else:
+                        full_text += "<span class='incorrect'>" + line[c] + "</span>"
                         incorrect += 1
+                
+                if len(line) < len(text_line):
+                    full_text += text_line[len(line):]
+
+                full_text += "\n"
+                correct += 1
 
             accuracy = correct / total
             time = body.get("end_time") - body.get("start_time")
@@ -95,7 +111,8 @@ def result(request: HttpRequest):
                 "wpm": round(wpm, 1),
                 "accuracy": round(accuracy * 100, 2),
                 "duration": round(time / 1000.0, 1),
-                "full_text": test.text.text
+                "full_text": full_text,
+                "test_id": test.id
             }
 
             test.complete = True
