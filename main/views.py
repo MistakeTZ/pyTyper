@@ -91,7 +91,7 @@ def result(request: HttpRequest):
 
             context = {
                 "programming_language": test.text.programming_language,
-                "source_url": None,
+                "source_url": test.text.source,
                 "wpm": round(wpm, 1),
                 "accuracy": round(accuracy * 100, 2),
                 "duration": round(time / 1000.0, 1),
