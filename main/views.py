@@ -72,7 +72,7 @@ def hints(request: HttpRequest):
         elif lang == "js":
             line_number = len(lines) - 1
             column = len(lines[-1])
-            result = lsp.get_completions(full_code, line_number, column)
+            result = lsp.completion(full_code, line_number, column)
 
             suggestions = []
             if result and 'items' in result:

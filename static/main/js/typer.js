@@ -211,6 +211,7 @@ function restartTest(sameText=false) {
 
     newText(sameText ? test_id : null, lang);
     renderText();
+    inputField.focus();
 }
 
 restartBtn.addEventListener("click", () => restartTest(true));

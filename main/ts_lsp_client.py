@@ -6,17 +6,18 @@ import shutil
 
 class TypeScriptLSP:
     def __init__(self):
-        TSSERVER_PATH = shutil.which("typescript-language-server")
-        if not TSSERVER_PATH:
+        self.tsserver_path = shutil.which("typescript-language-server")
+        if not self.tsserver_path:
             raise RuntimeError("typescript-language-server not found")
 
         self.proc = subprocess.Popen(
-            [TSSERVER_PATH, '--stdio'],
+            [self.tsserver_path, '--stdio'],
             stdin=subprocess.PIPE,
             stdout=subprocess.PIPE,
             stderr=subprocess.PIPE,
             bufsize=0
         )
+
         self.lock = threading.Lock()
         self.id_counter = 1
 
@@ -32,9 +33,24 @@ class TypeScriptLSP:
             headers = b''
             while b'\r\n\r\n' not in headers:
                 headers += self.proc.stdout.read(1)
-            length = int([line for line in headers.decode().split('\r\n') if line.startswith("Content-Length")][0].split(":")[1])
-            body = self.proc.stdout.read(length)
-            return json.loads(body)
+
+            header_text = headers.decode()
+            length_line = next(line for line in header_text.split('\r\n') if line.startswith("Content-Length"))
+            length = int(length_line.split(":")[1].strip())
+
+            body = b''
+            while len(body) < length:
+                chunk = self.proc.stdout.read(length - len(body))
+                if not chunk:
+                    break
+                body += chunk
+
+            try:
+                return json.loads(body)
+            except json.JSONDecodeError:
+                print("=== INVALID JSON ===")
+                print(body.decode(errors="replace"))
+                raise
 
     def _request(self, method, params):
         req_id = self.id_counter
@@ -52,32 +68,53 @@ class TypeScriptLSP:
                 return response["result"]
 
     def initialize(self):
-        return self._request("initialize", {
+        result = self._request("initialize", {
             "processId": None,
             "rootUri": None,
             "capabilities": {},
             "workspaceFolders": None
         })
+        self._send({
+            "jsonrpc": "2.0",
+            "method": "initialized",
+            "params": {}
+        })
+        return result
 
-    def shutdown(self):
-        self._request("shutdown", None)
-        self.proc.terminate()
+    def completion(self, code: str, line: int, character: int):
+        tmpfile = f"/tmp/{uuid.uuid4().hex}.ts"
+        uri = f"file://{tmpfile}"
 
-    def get_completions(self, code, line, character):
-        uri = f"file:///{uuid.uuid4().hex}.ts"
         self._send({
             "jsonrpc": "2.0",
             "method": "textDocument/didOpen",
             "params": {
                 "textDocument": {
                     "uri": uri,
-                    "languageId": "javascript",
+                    "languageId": "typescript",
                     "version": 1,
                     "text": code
                 }
             }
         })
+
         return self._request("textDocument/completion", {
             "textDocument": {"uri": uri},
             "position": {"line": line, "character": character}
         })
+
+    def shutdown(self):
+        try:
+            self._request("shutdown", None)
+        finally:
+            self.proc.terminate()
+
+if __name__ == "__main__":
+    code = "const x = Math."
+    lsp = TypeScriptLSP()
+    print("Initializing...")
+    lsp.initialize()
+    print("Requesting completions...")
+    result = lsp.completion(code, 0, len(code))
+    print(json.dumps(result, indent=2))
+    lsp.shutdown()
