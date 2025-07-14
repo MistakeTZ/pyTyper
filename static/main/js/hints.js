@@ -5,7 +5,13 @@ let activeHintIndex = 0;
 let afterDot = null;
 let splitted = null;
 
-const socket = new WebSocket('ws://localhost:8000/ws/hints/');
+const protocol = window.location.protocol === 'https:' ? 'wss://' : 'ws://';
+const socket = new WebSocket(`${protocol}${window.location.host}/ws/hints/`);
+
+socket.onopen = () => {
+    console.log("WebSocket connected");
+    socket.send(JSON.stringify({ query: "test" }));
+};
 
 socket.onmessage = function(e) {
     const data = JSON.parse(e.data);
@@ -21,6 +27,9 @@ socket.onmessage = function(e) {
     }
 };
 
+socket.onerror = (error) => {
+    console.error("WebSocket error:", error);
+};
 
 async function getHints() {
     // пример — можно заменить на fetch по API
