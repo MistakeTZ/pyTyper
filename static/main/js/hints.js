@@ -15,6 +15,7 @@ socket.onopen = () => {
 
 socket.onmessage = function(e) {
     const data = JSON.parse(e.data);
+
     if (afterDot !== null) {
         hints = data.hints.filter(h => h.toLowerCase().startsWith(afterDot.toLowerCase()));
     } else {
@@ -36,6 +37,7 @@ async function getHints() {
     const word = currentInput.trim().split(" ").pop();
     splitted = word.split("(")[word.split("(").length - 1];
     splitted = splitted.split("=")[word.split("=").length - 1];
+    splitted = splitted.split("<")[word.split("<").length - 1];
     if (!splitted && splitted === word) {
         hideHints();
         return;
@@ -92,7 +94,7 @@ function selectHint(index) {
     const word = words[words.length - 1];
     let lastIndex = -1;
 
-    ["(", "=", "."].forEach(symbol => {
+    ["(", "=", ".", "<"].forEach(symbol => {
         if (word.includes(symbol)) {
             lastIndex = Math.max(lastIndex, word.lastIndexOf(symbol));
         }

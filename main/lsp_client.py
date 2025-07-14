@@ -4,14 +4,18 @@ import threading
 import uuid
 import shutil
 
-class TypeScriptLSP:
-    def __init__(self):
-        self.tsserver_path = shutil.which("typescript-language-server")
-        if not self.tsserver_path:
-            raise RuntimeError("typescript-language-server not found")
+
+class LSPClient:
+    def __init__(self, ext, lang, command):
+        self.ext = ext
+        self.lang = lang
+
+        self.server_path = shutil.which(command)
+        if not self.server_path:
+            raise RuntimeError(f"{command} not found")
 
         self.proc = subprocess.Popen(
-            [self.tsserver_path, '--stdio'],
+            [self.server_path, "--stdio"],
             stdin=subprocess.PIPE,
             stdout=subprocess.PIPE,
             stderr=subprocess.PIPE,
@@ -45,12 +49,7 @@ class TypeScriptLSP:
                     break
                 body += chunk
 
-            try:
-                return json.loads(body)
-            except json.JSONDecodeError:
-                print("=== INVALID JSON ===")
-                print(body.decode(errors="replace"))
-                raise
+            return json.loads(body)
 
     def _request(self, method, params):
         req_id = self.id_counter
@@ -82,7 +81,7 @@ class TypeScriptLSP:
         return result
 
     def completion(self, code: str, line: int, character: int):
-        tmpfile = f"/tmp/{uuid.uuid4().hex}.ts"
+        tmpfile = f"/tmp/{uuid.uuid4().hex}.{self.ext}"
         uri = f"file://{tmpfile}"
 
         self._send({
@@ -91,7 +90,7 @@ class TypeScriptLSP:
             "params": {
                 "textDocument": {
                     "uri": uri,
-                    "languageId": "typescript",
+                    "languageId": self.lang,
                     "version": 1,
                     "text": code
                 }
@@ -111,10 +110,14 @@ class TypeScriptLSP:
 
 if __name__ == "__main__":
     code = "const x = Math."
-    lsp = TypeScriptLSP()
+    code = "<h"
+    # lsp = LSPClient("ts", "typescript", "typescript-language-server")
+    lsp = LSPClient("html", "html", "vscode-html-language-server")
     print("Initializing...")
     lsp.initialize()
     print("Requesting completions...")
+    print(code, 0, len(code))
     result = lsp.completion(code, 0, len(code))
-    print(json.dumps(result, indent=2))
+    print(result["items"])
+
     lsp.shutdown()

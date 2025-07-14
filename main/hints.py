@@ -1,18 +1,21 @@
 
 import jedi
-from .ts_lsp_client import TypeScriptLSP
+from .lsp_client import LSPClient
 
-lsp = TypeScriptLSP()
-lsp.initialize()
+ts_lsp = LSPClient("ts", "typescript", "typescript-language-server")
+ts_lsp.initialize()
+
+html_lsp = LSPClient("html", "html", "vscode-html-language-server")
+html_lsp.initialize()
 
 
 async def get_hints(data: dict):
     try:
         inputs = data.get("inputs", [])
-        lang = data.get("lang", "python")
+        lang = data.get("lang")
         lines = [line for line in inputs if line]
 
-        if not lines:
+        if not lines or not lang:
             return []
 
         current_line = lines[-1]
@@ -25,10 +28,15 @@ async def get_hints(data: dict):
 
             completions = script.complete(line=line_number, column=column)
             suggestions = [c.name for c in completions]
-        elif lang == "js":
-            line_number = len(lines) - 1
-            column = len(lines[-1])
-            result = lsp.completion(full_code, line_number, column)
+        else:
+            if lang == "js":
+                line_number = len(lines) - 1
+                column = len(lines[-1])
+                result = ts_lsp.completion(full_code, line_number, column)
+            if lang == "html":
+                line_number = len(lines) - 1
+                column = len(lines[-1])
+                result = html_lsp.completion(full_code, line_number, column)
 
             suggestions = []
             if result and 'items' in result:

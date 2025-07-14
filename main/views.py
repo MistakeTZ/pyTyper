@@ -28,7 +28,7 @@ def text(request: HttpRequest):
             text = Text.objects.order_by('?')[0]
         else:
             if lang == "javascript": lang = "js"
-            text = Text.objects.filter(programming_language=lang).order_by('?')[0]
+            text = Text.objects.filter(programming_language=lang.lower()).order_by('?')[0]
     if request.user.is_authenticated:
         test = Test.objects.create(text=text, user=request.user)
     else:
@@ -109,3 +109,11 @@ def result(request: HttpRequest):
             print(e)
 
     return render(request, 'main/result.html', context)
+
+
+def hints(request: HttpRequest):
+    if request.method == "POST":
+        data = json.loads(request.body.decode("utf-8"))
+        from .hints import get_hints
+        hints = get_hints(data)
+        return JsonResponse({"hints": hints})
