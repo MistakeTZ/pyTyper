@@ -2,12 +2,7 @@ from django.shortcuts import render
 from django.http import HttpRequest, JsonResponse
 from .models import Text, Test
 import json
-from django.views.decorators.csrf import csrf_exempt
-import jedi
-from .ts_lsp_client import TypeScriptLSP
 
-lsp = TypeScriptLSP()
-lsp.initialize()
 tests = []
 
 def typer(request: HttpRequest):
@@ -46,45 +41,6 @@ def text(request: HttpRequest):
         "test_id": test.id
     })
     return response
-
-
-@csrf_exempt
-def hints(request: HttpRequest):
-    if request.method != "POST":
-        return JsonResponse({"error": "Request method is not POST"}, status=400)
-
-    try:
-        data = json.loads(request.body)
-        inputs = data.get("inputs", [])
-        lang = data.get("lang", "python")
-        lines = [line for line in inputs if line]
-
-        if not lines:
-            return JsonResponse({'hints': []})
-
-        current_line = lines[-1]
-        full_code = '\n'.join(lines)
-
-        if lang == "python":
-            line_number = len(lines)
-            column = len(current_line)
-            script = jedi.Script(code=full_code)
-
-            completions = script.complete(line=line_number, column=column)
-            suggestions = [c.name for c in completions]
-        elif lang == "js":
-            line_number = len(lines) - 1
-            column = len(lines[-1])
-            result = lsp.completion(full_code, line_number, column)
-
-            suggestions = []
-            if result and 'items' in result:
-                suggestions = [item['label'] for item in result['items']]
-
-        return JsonResponse({'hints': suggestions})
-    except Exception as e:
-        print(e)
-        return JsonResponse({"error": str(e)}, status=500)
 
 
 def result(request: HttpRequest):

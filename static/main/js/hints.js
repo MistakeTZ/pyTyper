@@ -2,17 +2,35 @@ const hintsBox = document.getElementById("hintsBox");
 let hints = [];
 let context = {};
 let activeHintIndex = 0;
+let afterDot = null;
+let splitted = null;
+
+const socket = new WebSocket('ws://localhost:8000/ws/hints/');
+
+socket.onmessage = function(e) {
+    const data = JSON.parse(e.data);
+    if (afterDot !== null) {
+        hints = data.hints.filter(h => h.toLowerCase().startsWith(afterDot.toLowerCase()));
+    } else {
+        hints = data.hints.filter(h => h.toLowerCase().startsWith(splitted.toLowerCase()));
+    }
+
+    if (hints.length > 0) {
+        activeHintIndex = 0;
+        showHints();
+    }
+};
+
 
 async function getHints() {
     // пример — можно заменить на fetch по API
     const word = currentInput.trim().split(" ").pop();
-    let splitted = word.split("(")[word.split("(").length - 1];
+    splitted = word.split("(")[word.split("(").length - 1];
     splitted = splitted.split("=")[word.split("=").length - 1];
     if (!splitted && splitted === word) {
         hideHints();
         return;
     }
-    let afterDot = null;
     const dotCount = splitted.split(".").length - 1;
     if (dotCount) {
         afterDot = splitted.split(".")[dotCount];
@@ -30,31 +48,7 @@ async function getHints() {
         hideHints();
     }
 
-    await fetch('/api/hints', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({ "inputs": inputs, "lang": programming_language })
-    })
-    .then(response => response.json())
-    .then(data => {
-        if (data.error) {
-            console.error(data.error);
-            return;
-        }
-        if (afterDot !== null) {
-            hints = data.hints.filter(h => h.toLowerCase().startsWith(afterDot.toLowerCase()));
-        } else {
-            hints = data.hints.filter(h => h.toLowerCase().startsWith(splitted.toLowerCase()));
-        }
-
-        if (hints.length > 0) {
-            activeHintIndex = 0;
-            showHints();
-        }
-    })
-    .catch(error => console.error(error));
+    socket.send(JSON.stringify({ "inputs": inputs, "lang": programming_language }));
 }
 
 function showHints() {
