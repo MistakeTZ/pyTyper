@@ -34,7 +34,10 @@ def text(request: HttpRequest):
         else:
             if lang == "javascript": lang = "js"
             text = Text.objects.filter(programming_language=lang).order_by('?')[0]
-    test = Test.objects.create(text=text, user=request.user)
+    if request.user.is_authenticated:
+        test = Test.objects.create(text=text, user=request.user)
+    else:
+        test = Test.objects.create(text=text)
 
     response = JsonResponse({
         "text": text.text.split("\n"),
