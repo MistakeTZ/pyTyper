@@ -135,6 +135,9 @@ inputField.addEventListener("keydown", (e) => {
             e.preventDefault();
             activeHintIndex = (activeHintIndex - 1 + hints.length) % hints.length;
             showHints();
+        } else if (e.key === "Escape") {
+            e.preventDefault();
+            hideHints();
         }
     } else if (e.key === "Tab") {
         inputField.value += "    ";
@@ -143,6 +146,11 @@ inputField.addEventListener("keydown", (e) => {
         inputs[currentLine] = currentInput;
         renderText();
         hideHints();
+    } 
+    if (e.key === " " && e.ctrlKey) {
+        e.preventDefault();
+        getHints();
+        return;
     }
     
     if (e.key === "Backspace") {
@@ -155,8 +163,10 @@ inputField.addEventListener("keydown", (e) => {
                 renderText();
             }
             return;
-        } else if (inputField.value.endsWith("    ")) {
+        } else if (inputField.value.endsWith("    ") && programming_language === "python") {
             inputField.value = inputField.value.slice(0, -3);
+        } else if (inputField.value.endsWith("  ") && programming_language === "js") {
+            inputField.value = inputField.value.slice(0, -1);
         }
     } else if (e.key === "Enter") {
         if (e.ctrlKey) {
@@ -171,8 +181,10 @@ inputField.addEventListener("keydown", (e) => {
                 break;
             }
         }
-        if (currentInput.trim().endsWith(":")) {
+        if (currentInput.trim().endsWith(":") && programming_language === "python") {
             tabs += 4;
+        } else if (currentInput.trim().endsWith("{") && programming_language === "js") {
+            tabs += 2;
         }
         currentLine++;
         currentInput = " ".repeat(tabs);

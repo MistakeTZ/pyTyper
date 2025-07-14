@@ -80,6 +80,7 @@ def hints(request: HttpRequest):
 
         return JsonResponse({'hints': suggestions})
     except Exception as e:
+        print(e)
         return JsonResponse({"error": str(e)}, status=500)
 
 

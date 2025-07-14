@@ -19,9 +19,9 @@ async function getHints() {
     }
 
     if (afterDot) {
-        hints = hints.filter(h => h.startsWith(afterDot));
+        hints = hints.filter(h => h.toLowerCase().startsWith(afterDot.toLowerCase()));
     } else {
-        hints = hints.filter(h => h.startsWith(splitted));
+        hints = hints.filter(h => h.toLowerCase().startsWith(splitted.toLowerCase()));
     }
 
     if (hints.length > 0) {
@@ -44,9 +44,9 @@ async function getHints() {
             return;
         }
         if (afterDot !== null) {
-            hints = data.hints.filter(h => h.startsWith(afterDot));
+            hints = data.hints.filter(h => h.toLowerCase().startsWith(afterDot.toLowerCase()));
         } else {
-            hints = data.hints.filter(h => h.startsWith(splitted));
+            hints = data.hints.filter(h => h.toLowerCase().startsWith(splitted.toLowerCase()));
         }
 
         if (hints.length > 0) {
