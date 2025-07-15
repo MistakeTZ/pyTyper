@@ -5,9 +5,6 @@
     <meta charset="UTF-8">
     <meta name="csrf-token" content="{{ csrf_token }}">
     <title>Test results</title>
-    <link rel="icon" type="image/png" href="{% static 'typer/favicon.png' %}">
-    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="{% static 'main/css/result.css' %}">
 </head>
 <body>
     <div class="result-container">
@@ -38,13 +35,11 @@
             <p>{{ full_text|safe }}</p>
         </div>
 
-        <div class="button-group">
+        <div class="button-group res-btn-group">
             <a href="/?test_id={{ test_id }}" class="btn btn-primary">
-                <span>↻</span>
                 Restart
             </a>
             <a href="/" class="btn">
-                <span>+</span>
                 New Text
             </a>
         </div>

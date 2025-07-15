@@ -263,24 +263,25 @@ body {
     transform: translateY(0);
 }
 
-#restartBtn {
+.btn-primary {
     background: var(--accent);
     color: var(--bg-primary);
     border-color: var(--accent);
 }
 
-#restartBtn:hover {
+.btn-primary:hover {
     background: var(--accent);
     filter: brightness(1.1);
+    border-color: var(--accent);
 }
 
-#restartBtn::before {
-    content: '↻';
+.btn::before {
+    content: '+';
     font-size: 1.1rem;
 }
 
-#newTextBtn::before {
-    content: '+';
+.btn-primary::before {
+    content: '↻';
     font-size: 1.1rem;
 }
 
