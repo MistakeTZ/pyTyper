@@ -1,48 +1,38 @@
 {% load static %}
-<!DOCTYPE html>
-<html lang="ru">
-<head>
-    <meta charset="UTF-8">
-    <meta name="csrf-token" content="{{ csrf_token }}">
-    <title>Test results</title>
-</head>
-<body>
-    <div class="result-container">
-        <h1>Test Results</h1>
+<div class="result-container">
+<h1>Test Results</h1>
 
-        <div class="result-info">
-            <p><strong>Programming language:</strong> {{ programming_language }}</p>
-            <p><strong>Source:</strong> <a href="{{ source_url }}" {% if source_url != "#" %}target="_blank"{% endif %}>{{ source }}</a></p>
-        </div>
+<div class="result-info">
+    <p><strong>Programming language:</strong> {{ programming_language }}</p>
+    <p><strong>Source:</strong> <a href="{{ source_url }}" {% if source_url != "#" %}target="_blank"{% endif %}>{{ source }}</a></p>
+</div>
 
-        <div class="result-stats">
-            <div class="stat-card">
-                <div class="stat-value">{{ wpm }}</div>
-                <div class="stat-label">WPM</div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-value">{{ accuracy }}%</div>
-                <div class="stat-label">Accuracy</div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-value">{{ duration }}s</div>
-                <div class="stat-label">Duration</div>
-            </div>
-        </div>
-
-        <div class="result-text">
-            <h3>Text</h3>
-            <p>{{ full_text|safe }}</p>
-        </div>
-
-        <div class="button-group res-btn-group">
-            <a href="/?test_id={{ test_id }}" class="btn btn-primary">
-                Restart
-            </a>
-            <a href="/" class="btn">
-                New Text
-            </a>
-        </div>
+<div class="result-stats">
+    <div class="stat-card">
+        <div class="stat-value">{{ wpm }}</div>
+        <div class="stat-label">WPM</div>
     </div>
-</body>
-</html>
+    <div class="stat-card">
+        <div class="stat-value">{{ accuracy }}%</div>
+        <div class="stat-label">Accuracy</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-value">{{ duration }}s</div>
+        <div class="stat-label">Duration</div>
+    </div>
+</div>
+
+<div class="result-text">
+    <h3>Text</h3>
+    <p>{{ full_text|safe }}</p>
+</div>
+
+<div class="button-group res-btn-group">
+    <a href="/?test_id={{ test_id }}" class="btn btn-primary">
+        Restart
+    </a>
+    <a href="/" class="btn">
+        New Text
+    </a>
+</div>
+</div>

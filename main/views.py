@@ -88,8 +88,13 @@ def result(request: HttpRequest):
             time = body.get("end_time") - body.get("start_time")
             wpm = (correct + incorrect) / 5 / (time / 60000)
 
+            lang = test.text.programming_language
+            if lang == "js": lang = "JavaScript"
+            elif lang == "html": lang = "HTML"
+            else: lang = lang.capitalize()
+
             context = {
-                "programming_language": test.text.programming_language,
+                "programming_language": lang,
                 "source": test.text.source,
                 "source_url": test.text.source_link or "#",
                 "wpm": round(wpm, 1),

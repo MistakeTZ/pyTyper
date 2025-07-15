@@ -32,9 +32,11 @@ socket.onerror = (error) => {
     console.error("WebSocket error:", error);
 };
 
-async function getHints() {
+async function getHints(force=false) {
     // пример — можно заменить на fetch по API
     const word = currentInput.trim().split(" ").pop();
+    afterDot = null;
+
     splitted = word.split("(")[word.split("(").length - 1];
     splitted = splitted.split("=")[word.split("=").length - 1];
     splitted = splitted.split("<")[word.split("<").length - 1];
@@ -59,7 +61,11 @@ async function getHints() {
         hideHints();
     }
 
-    socket.send(JSON.stringify({ "inputs": inputs, "lang": programming_language }));
+    force = force || dotCount > 0 && afterDot.length == 0;
+    force = force || dotCount == 0 && splitted.length == 1 && !splitted.endsWith("\"") && !splitted.endsWith("'");
+    if (force) {
+        socket.send(JSON.stringify({ "inputs": inputs, "lang": programming_language }));
+    }
 }
 
 function showHints() {

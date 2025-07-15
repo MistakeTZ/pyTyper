@@ -149,7 +149,7 @@ inputField.addEventListener("keydown", (e) => {
     } 
     if (e.key === " " && e.ctrlKey) {
         e.preventDefault();
-        getHints();
+        getHints(true);
         return;
     }
     
@@ -163,9 +163,13 @@ inputField.addEventListener("keydown", (e) => {
                 renderText();
             }
             return;
-        } else if (inputField.value.endsWith("    ") && programming_language === "python") {
-            inputField.value = inputField.value.slice(0, -3);
-        } else if (inputField.value.endsWith("  ") && programming_language === "js") {
+        } else if (inputField.value.endsWith("    ")) {
+            if (programming_language === "js") {
+                inputField.value = inputField.value.slice(0, -1);
+            } else {
+                inputField.value = inputField.value.slice(0, -3);
+            }
+        } else if (inputField.value.endsWith(" " && programming_language === "js")) {
             inputField.value = inputField.value.slice(0, -1);
         }
     } else if (e.key === "Enter") {
