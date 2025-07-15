@@ -11,12 +11,11 @@ class LSPClient:
         self.lang = lang
 
         self.server_path = shutil.which(command)
-        # self.server_path = r"C:\Users\Admin\scoop\apps\llvm\20.1.8\bin\clangd.exe"
         if not self.server_path:
             raise RuntimeError(f"{command} not found")
 
         self.proc = subprocess.Popen(
-            [self.server_path, parametres],
+            [self.server_path, *parametres.split()],
             stdin=subprocess.PIPE,
             stdout=subprocess.PIPE,
             stderr=subprocess.PIPE,
@@ -110,17 +109,20 @@ class LSPClient:
             self.proc.terminate()
 
 if __name__ == "__main__":
-    code = "const x = Math."
-    code = "<h"
-    code = "#include <vector>\nint main() { std::vec"
+    import sys
+    if sys.argv[1:]:
+        code = sys.argv[1]
+    else:
+        code = "<ht"
     # lsp = LSPClient("ts", "typescript", "typescript-language-server")
+    # lsp = LSPClient("cpp", "cpp", "clangd", "--enable-config")
     # lsp = LSPClient("html", "html", "vscode-html-language-server")
-    lsp = LSPClient("cpp", "cpp", "clangd", "--enable-config")
+    lsp = LSPClient("sql", "sql", "sql-language-server")
     print("Initializing...")
     lsp.initialize()
     print("Requesting completions...")
     print(code, 0, len(code))
     result = lsp.completion(code, 0, len(code))
-    print(result["items"])
+    print([res["label"] for res in result["items"]])
 
     lsp.shutdown()

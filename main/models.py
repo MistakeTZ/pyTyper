@@ -1,9 +1,18 @@
 from django.db import models
 
 
+class ProgrammingLanguage(models.Model):
+    name = models.CharField(max_length=100)
+    short_name = models.CharField(max_length=100)
+    tab_count = models.IntegerField(default=4)
+
+    def __str__(self):
+        return self.name
+
+
 class Text(models.Model):
     text = models.TextField(default="")
-    programming_language = models.CharField(max_length=100, default="")
+    prolang = models.ForeignKey(ProgrammingLanguage, on_delete=models.SET_NULL, null=True)
     source = models.CharField(max_length=100, default="")
     source_link = models.CharField(max_length=100)
     created_at = models.DateTimeField(auto_now_add=True)

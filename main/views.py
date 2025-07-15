@@ -1,6 +1,7 @@
 from django.shortcuts import render
 from django.http import HttpRequest, JsonResponse
-from .models import Text, Test
+from .models import Text, Test, ProgrammingLanguage
+from django.db.models import Q
 import json
 
 tests = []
@@ -24,12 +25,12 @@ def text(request: HttpRequest):
                 text = test.text
 
     if not text:
-        if lang is None or lang == "random":
+        if lang is None or lang == "random" or lang == "Random":
             text = Text.objects.order_by('?')[0]
+            prolang = text.prolang
         else:
-            if lang == "javascript": lang = "js"
-            if lang == "C++": lang = "cpp"
-            text = Text.objects.filter(programming_language=lang.lower()).order_by('?')[0]
+            prolang = ProgrammingLanguage.objects.get(Q(short_name=lang) | Q(name=lang))
+            text = Text.objects.filter(prolang=prolang).order_by('?')[0]
     if request.user.is_authenticated:
         test = Test.objects.create(text=text, user=request.user)
     else:
@@ -38,7 +39,9 @@ def text(request: HttpRequest):
     response = JsonResponse({
         "text": text.text.split("\n"),
         "id": text.id,
-        "programming_language": text.programming_language,
+        "pl_name": prolang.name,
+        "prolang": prolang.short_name,
+        "tab_count": prolang.tab_count,
         "test_id": test.id
     })
     return response
@@ -91,14 +94,10 @@ def result(request: HttpRequest):
             time = body.get("end_time") - body.get("start_time")
             wpm = (correct + incorrect) / 5 / (time / 60000)
 
-            lang = test.text.programming_language
-            if lang == "js": lang = "JavaScript"
-            elif lang == "html": lang = "HTML"
-            elif lang == "cpp": lang = "C++"
-            else: lang = lang.capitalize()
+            lang = test.text.prolang
 
             context = {
-                "programming_language": lang,
+                "prolang": lang.name,
                 "source": test.text.source,
                 "source_url": test.text.source_link or "#",
                 "wpm": round(wpm, 1),

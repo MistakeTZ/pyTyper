@@ -8,8 +8,9 @@ ts_lsp.initialize()
 html_lsp = LSPClient("html", "html", "vscode-html-language-server")
 html_lsp.initialize()
 
-cpp_lsp = LSPClient("cpp", "cpp", "clangd", "--enable-config")
-cpp_lsp.initialize()
+# cpp_lsp = LSPClient("cpp", "cpp", r"C:\Users\Admin\scoop\apps\llvm\20.1.8\bin\clangd.exe", "--enable-config")
+# cpp_lsp = LSPClient("cpp", "cpp", "clangd", "--enable-config")
+# cpp_lsp.initialize()
 
 
 async def get_hints(data: dict):
@@ -39,11 +40,14 @@ async def get_hints(data: dict):
             elif lang == "html":
                 result = html_lsp.completion(full_code, line_number, column)
             elif lang == "cpp":
+                return []
                 result = cpp_lsp.completion(full_code, line_number, column)
+            else:
+                return []
 
             suggestions = []
             if result and 'items' in result:
-                suggestions = [item['label'] for item in result['items']]
+                suggestions = [item['label'].strip() for item in result['items']]
 
         return suggestions
     except Exception as e:

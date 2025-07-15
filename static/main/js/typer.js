@@ -5,7 +5,10 @@ const newTextBtn = document.getElementById("newTextBtn");
 
 let text = ["If you see this - then something went wrong"];
 let test_id = 0;
-let programming_language = "python";
+
+let prolang = "python";
+let pl_name = "Python";
+let tab_count = 4;
 
 let currentInput = "";
 let inputs = [];
@@ -25,7 +28,10 @@ function newText(test, lang) {
     .then(data => {
         text = data.text;
         test_id = data.test_id;
-        programming_language = data.programming_language;
+
+        prolang = data.prolang;
+        pl_name = data.pl_name;
+        tab_count = data.tab_count;
 
         inputs = Array(text.length).fill(""); // сбрасываем ввод
         currentLine = 0;
@@ -141,8 +147,8 @@ inputField.addEventListener("keydown", (e) => {
             e.preventDefault();
             hideHints();
         }
-    } else if (e.key === "Tab") { // TODO: Smart HTML tabulation
-        inputField.value += "    "; // TODO: JS and HTML 2 spaces
+    } else if (e.key === "Tab") {
+        inputField.value += " ".repeat(tab_count);
         e.preventDefault();
         currentInput = inputField.value;
         inputs[currentLine] = currentInput;
@@ -165,14 +171,8 @@ inputField.addEventListener("keydown", (e) => {
                 renderText();
             }
             return;
-        } else if (inputField.value.endsWith("    ")) {
-            if (programming_language !== "python" && programming_language !== "cpp") {
-                inputField.value = inputField.value.slice(0, -1);
-            } else {
-                inputField.value = inputField.value.slice(0, -3);
-            }
-        } else if (inputField.value.endsWith(" " && (programming_language === "js" || programming_language === "html"))) {
-            inputField.value = inputField.value.slice(0, -1);
+        } else if (inputField.value.endsWith(" ".repeat(tab_count))) {
+            inputField.value = inputField.value.slice(0, -tab_count + 1);
         }
     } else if (e.key === "Enter") {
         if (e.ctrlKey) {
@@ -187,11 +187,16 @@ inputField.addEventListener("keydown", (e) => {
                 break;
             }
         }
-        if (currentInput.trim().endsWith(":") && programming_language === "python") {
+        // TODO: Smart HTML tabulation
+        if (currentInput.trim().endsWith(":") && prolang === "python") {
             tabs += 4;
-        } else if (currentInput.trim().endsWith("{") && programming_language === "js") {
+        } else if (currentInput.trim().endsWith("{") && prolang === "js") {
             tabs += 2;
-        } else if (currentInput.trim().endsWith("{") && programming_language === "cpp") {
+        } else if (currentInput.trim().endsWith("{") && prolang === "cpp") {
+            tabs += 4;
+        } else if (currentInput.trim().endsWith("{") && prolang === "java") {
+            tabs += 4;
+        } else if (currentInput.trim().endsWith("(") && prolang === "sql") {
             tabs += 4;
         }
         currentLine++;
@@ -214,8 +219,8 @@ function restartTest(sameText=false) {
     startTime = null;
     totalTypedChars = 0;
     clearInterval(wpmInterval);
-    document.getElementById("wpmDisplay").textContent = "Скорость: 0 WPM";
-    let lang = document.getElementById("selected").textContent.toLowerCase();
+    document.getElementById("wpmDisplay").textContent = "WPM: 0";
+    let lang = document.getElementById("selected").textContent;
 
     newText(sameText ? test_id : null, lang);
     renderText();
@@ -229,12 +234,12 @@ newTextBtn.addEventListener("click", () => restartTest(false));
 document.addEventListener("DOMContentLoaded", () => {
     let test = document.querySelector("meta[name=test-id]");
 
-    programming_language = localStorage.getItem('programming_language') || "python";
-    let option = document.querySelector(`.option[data-value="${programming_language}"]`);
+    prolang = localStorage.getItem('prolang') || "python";
+    let option = document.querySelector(`.option[data-value="${prolang}"]`);
     option.classList.add('selected');
     selected.textContent = option.textContent;
 
-    newText(test.content, programming_language);
+    newText(test.content, prolang);
     inputField.focus();
 });
 

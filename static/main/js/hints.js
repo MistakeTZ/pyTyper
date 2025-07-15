@@ -35,26 +35,31 @@ socket.onerror = (error) => {
 async function getHints(force=false) {
     // пример — можно заменить на fetch по API
     const word = currentInput.trim().split(" ").pop();
+    splitted = word;
     afterDot = null;
 
-    splitted = word.split("(")[word.split("(").length - 1];
-    splitted = word.split("[")[word.split("[").length - 1];
-    splitted = word.split(":")[word.split(":").length - 1];
-    splitted = splitted.split("=")[word.split("=").length - 1];
-    splitted = splitted.split("<")[word.split("<").length - 1];
-    if (!splitted && splitted === word) {
-        hideHints();
-        return;
-    }
+    ["(", "[", ":", "=", "<", "#"].forEach(symbol => {
+        if (splitted.includes(symbol)) {
+            splitted = splitted.split(symbol)[splitted.split(symbol).length - 1];
+        }
+    })
+
     const dotCount = splitted.split(".").length - 1;
     if (dotCount) {
         afterDot = splitted.split(".")[dotCount];
-    }
-
-    if (afterDot) {
-        hints = hints.filter(h => h.toLowerCase().startsWith(afterDot.toLowerCase()));
+        if (afterDot.length == 0) {
+            hints = [];
+            force = true;
+        } else {
+            hints = hints.filter(h => h.toLowerCase().startsWith(afterDot.toLowerCase()));
+        }
     } else {
-        hints = hints.filter(h => h.toLowerCase().startsWith(splitted.toLowerCase()));
+        if (splitted.length == 1 && !splitted.endsWith("\"") && !splitted.endsWith("'")) {
+            hints = [];
+            force = true;
+        } else {
+            hints = hints.filter(h => h.toLowerCase().startsWith(splitted.toLowerCase()));
+        }
     }
 
     if (hints.length > 0) {
@@ -63,10 +68,8 @@ async function getHints(force=false) {
         hideHints();
     }
 
-    force = force || dotCount > 0 && afterDot.length == 0;
-    force = force || dotCount == 0 && splitted.length == 1 && !splitted.endsWith("\"") && !splitted.endsWith("'");
     if (force) {
-        socket.send(JSON.stringify({ "inputs": inputs, "lang": programming_language }));
+        socket.send(JSON.stringify({ "inputs": inputs, "lang": prolang }));
     }
 }
 
