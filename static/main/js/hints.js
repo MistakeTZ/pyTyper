@@ -38,6 +38,7 @@ async function getHints(force=false) {
     afterDot = null;
 
     splitted = word.split("(")[word.split("(").length - 1];
+    splitted = word.split("[")[word.split("[").length - 1];
     splitted = splitted.split("=")[word.split("=").length - 1];
     splitted = splitted.split("<")[word.split("<").length - 1];
     if (!splitted && splitted === word) {

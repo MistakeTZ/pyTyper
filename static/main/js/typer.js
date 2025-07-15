@@ -139,7 +139,7 @@ inputField.addEventListener("keydown", (e) => {
             e.preventDefault();
             hideHints();
         }
-    } else if (e.key === "Tab") {
+    } else if (e.key === "Tab") { // TODO: Smart HTML tabulation
         inputField.value += "    ";
         e.preventDefault();
         currentInput = inputField.value;
@@ -164,12 +164,12 @@ inputField.addEventListener("keydown", (e) => {
             }
             return;
         } else if (inputField.value.endsWith("    ")) {
-            if (programming_language === "js") {
+            if (programming_language !== "python") {
                 inputField.value = inputField.value.slice(0, -1);
             } else {
                 inputField.value = inputField.value.slice(0, -3);
             }
-        } else if (inputField.value.endsWith(" " && programming_language === "js")) {
+        } else if (inputField.value.endsWith(" " && programming_language !== "python")) {
             inputField.value = inputField.value.slice(0, -1);
         }
     } else if (e.key === "Enter") {
