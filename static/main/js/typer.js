@@ -38,6 +38,8 @@ function newText(test, lang) {
 
 
 function endTest() {
+    socket.close();
+
     fetch("/end", {
         method: "POST",
         headers: {
@@ -224,7 +226,13 @@ newTextBtn.addEventListener("click", () => restartTest(false));
 
 document.addEventListener("DOMContentLoaded", () => {
     let test = document.querySelector("meta[name=test-id]");
-    newText(test.content, "python");
+
+    programming_language = localStorage.getItem('programming_language') || "python";
+    let option = document.querySelector(`.option[data-value="${programming_language}"]`);
+    option.classList.add('selected');
+    selected.textContent = option.textContent;
+
+    newText(test.content, programming_language);
     inputField.focus();
 });
 

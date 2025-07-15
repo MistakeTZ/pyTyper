@@ -63,23 +63,25 @@ def result(request: HttpRequest):
                 total += len(text_line) + 1
 
                 if len(lines) <= i:
-                    full_text += line + "\n"
+                    full_text += replace_html_tags(line) + "\n"
                     continue
                 line = lines[i]
                 for c in range(len(line)):
                     if len(text_line) <= c:
-                        full_text += "<span-class='incorrect'>" + line[c:] + "</span>\n"
+                        full_text += "<span-class='incorrect'>" + \
+                            replace_html_tags(line[c:]) + "</span>\n"
                         break
 
+                    symbol = replace_html_tags(line[c])
                     if line[c] == text_line[c]:
-                        full_text += "<span-class='correct'>" + line[c] + "</span>"
+                        full_text += "<span-class='correct'>" + symbol + "</span>"
                         correct += 1
                     else:
-                        full_text += "<span-class='incorrect'>" + line[c] + "</span>"
+                        full_text += "<span-class='incorrect'>" + symbol + "</span>"
                         incorrect += 1
                 
                 if len(line) < len(text_line):
-                    full_text += text_line[len(line):]
+                    full_text += replace_html_tags(text_line[len(line):])
 
                 full_text += "\n"
                 correct += 1
@@ -114,6 +116,10 @@ def result(request: HttpRequest):
             print(e)
 
     return render(request, 'main/result.html', context)
+
+
+def replace_html_tags(text: str):
+    return text.replace("<", "&lt;").replace(">", "&gt;")
 
 
 def hints(request: HttpRequest):

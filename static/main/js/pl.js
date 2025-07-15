@@ -24,6 +24,7 @@ document.querySelectorAll('.option').forEach(option => {
         // Update selected state
         document.querySelectorAll('.option').forEach(opt => opt.classList.remove('selected'));
         option.classList.add('selected');
+        localStorage.setItem('programming_language', option.dataset.value);
 
         restartTest(false);
     });
