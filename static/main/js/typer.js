@@ -142,7 +142,7 @@ inputField.addEventListener("keydown", (e) => {
             hideHints();
         }
     } else if (e.key === "Tab") { // TODO: Smart HTML tabulation
-        inputField.value += "    ";
+        inputField.value += "    "; // TODO: JS and HTML 2 spaces
         e.preventDefault();
         currentInput = inputField.value;
         inputs[currentLine] = currentInput;
@@ -166,12 +166,12 @@ inputField.addEventListener("keydown", (e) => {
             }
             return;
         } else if (inputField.value.endsWith("    ")) {
-            if (programming_language !== "python") {
+            if (programming_language !== "python" && programming_language !== "cpp") {
                 inputField.value = inputField.value.slice(0, -1);
             } else {
                 inputField.value = inputField.value.slice(0, -3);
             }
-        } else if (inputField.value.endsWith(" " && programming_language !== "python")) {
+        } else if (inputField.value.endsWith(" " && (programming_language === "js" || programming_language === "html"))) {
             inputField.value = inputField.value.slice(0, -1);
         }
     } else if (e.key === "Enter") {
@@ -191,6 +191,8 @@ inputField.addEventListener("keydown", (e) => {
             tabs += 4;
         } else if (currentInput.trim().endsWith("{") && programming_language === "js") {
             tabs += 2;
+        } else if (currentInput.trim().endsWith("{") && programming_language === "cpp") {
+            tabs += 4;
         }
         currentLine++;
         currentInput = " ".repeat(tabs);

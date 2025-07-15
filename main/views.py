@@ -28,6 +28,7 @@ def text(request: HttpRequest):
             text = Text.objects.order_by('?')[0]
         else:
             if lang == "javascript": lang = "js"
+            if lang == "C++": lang = "cpp"
             text = Text.objects.filter(programming_language=lang.lower()).order_by('?')[0]
     if request.user.is_authenticated:
         test = Test.objects.create(text=text, user=request.user)
@@ -93,6 +94,7 @@ def result(request: HttpRequest):
             lang = test.text.programming_language
             if lang == "js": lang = "JavaScript"
             elif lang == "html": lang = "HTML"
+            elif lang == "cpp": lang = "C++"
             else: lang = lang.capitalize()
 
             context = {

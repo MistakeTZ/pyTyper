@@ -8,6 +8,9 @@ ts_lsp.initialize()
 html_lsp = LSPClient("html", "html", "vscode-html-language-server")
 html_lsp.initialize()
 
+cpp_lsp = LSPClient("cpp", "cpp", "clangd", "--enable-config")
+cpp_lsp.initialize()
+
 
 async def get_hints(data: dict):
     try:
@@ -29,14 +32,14 @@ async def get_hints(data: dict):
             completions = script.complete(line=line_number, column=column)
             suggestions = [c.name for c in completions]
         else:
+            line_number = len(lines) - 1
+            column = len(lines[-1])
             if lang == "js":
-                line_number = len(lines) - 1
-                column = len(lines[-1])
                 result = ts_lsp.completion(full_code, line_number, column)
-            if lang == "html":
-                line_number = len(lines) - 1
-                column = len(lines[-1])
+            elif lang == "html":
                 result = html_lsp.completion(full_code, line_number, column)
+            elif lang == "cpp":
+                result = cpp_lsp.completion(full_code, line_number, column)
 
             suggestions = []
             if result and 'items' in result:
