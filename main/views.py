@@ -9,7 +9,7 @@ tests = []
 
 def typer(request: HttpRequest):
     test_id = 0 or request.GET.get("test_id")
-    return render(request, 'main/typer.html', {"test_id": test_id})
+    return render(request, 'main/typer.html', {"test_id": test_id, "langs": ProgrammingLanguage.objects.all()})
 
 
 def text(request: HttpRequest):

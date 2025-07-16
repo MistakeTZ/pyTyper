@@ -196,14 +196,14 @@ inputField.addEventListener("keydown", (e) => {
         }
         if (prolang == "html") {
             tabs += Math.max(0, isOpened(currentInput)) * tab_count;
+        } else {
+            ["(", "[", "{", ":"].forEach(symbol => {
+                if (currentInput.trim().endsWith(symbol)) {
+                    tabs += tab_count;
+                    return;
+                }
+            })
         }
-
-        ["(", "[", "{", ":"].forEach(symbol => {
-            if (currentInput.trim().endsWith(symbol)) {
-                tabs = tab_count;
-                return;
-            }
-        })
 
         currentLine++;
         currentInput = " ".repeat(tabs);
