@@ -33,6 +33,7 @@ function newText(test, lang) {
         pl_name = data.pl_name;
         tab_count = data.tab_count;
 
+        if (prolang == "html") opened = 0;
         inputs = Array(text.length).fill(""); // сбрасываем ввод
         currentLine = 0;
         currentInput = "";
@@ -187,18 +188,17 @@ inputField.addEventListener("keydown", (e) => {
                 break;
             }
         }
-        // TODO: Smart HTML tabulation
-        if (currentInput.trim().endsWith(":") && prolang === "python") {
-            tabs += 4;
-        } else if (currentInput.trim().endsWith("{") && prolang === "js") {
-            tabs += 2;
-        } else if (currentInput.trim().endsWith("{") && prolang === "cpp") {
-            tabs += 4;
-        } else if (currentInput.trim().endsWith("{") && prolang === "java") {
-            tabs += 4;
-        } else if (currentInput.trim().endsWith("(") && prolang === "sql") {
-            tabs += 4;
+        if (prolang == "html") {
+            tabs += Math.max(0, isOpened(currentInput)) * tab_count;
         }
+
+        ["(", "[", "{", ":"].forEach(symbol => {
+            if (currentInput.trim().endsWith(symbol)) {
+                tabs = tab_count;
+                return;
+            }
+        })
+
         currentLine++;
         currentInput = " ".repeat(tabs);
         inputField.value = currentInput;
