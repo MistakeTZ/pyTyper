@@ -84,7 +84,7 @@ def result(request: HttpRequest):
                         correct += 1
                     else:
                         if test.text.prolang.short_name == "sql":
-                            if sql_checker(line, c, symbol):
+                            if sql_checker(text_line, c, symbol):
                                 full_text += "<span-class='correct'>" + symbol + "</span>"
                                 correct += 1
                                 continue
