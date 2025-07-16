@@ -3,6 +3,7 @@ from django.http import HttpRequest, JsonResponse
 from .models import Text, Test, ProgrammingLanguage
 from django.db.models import Q
 import json
+from .tasks import sql_checker, replace_html_tags
 
 tests = []
 
@@ -23,6 +24,7 @@ def text(request: HttpRequest):
             test = Test.objects.get(id=test_id)
             if test:
                 text = test.text
+                prolang = test.text.prolang
 
     if not text:
         if lang is None or lang == "random" or lang == "Random":
@@ -81,6 +83,11 @@ def result(request: HttpRequest):
                         full_text += "<span-class='correct'>" + symbol + "</span>"
                         correct += 1
                     else:
+                        if test.text.prolang.short_name == "sql":
+                            if sql_checker(line, c, symbol):
+                                full_text += "<span-class='correct'>" + symbol + "</span>"
+                                correct += 1
+                                continue
                         full_text += "<span-class='incorrect'>" + symbol + "</span>"
                         incorrect += 1
                 
@@ -117,10 +124,6 @@ def result(request: HttpRequest):
             print(e)
 
     return render(request, 'main/result.html', context)
-
-
-def replace_html_tags(text: str):
-    return text.replace("<", "&lt;").replace(">", "&gt;")
 
 
 def hints(request: HttpRequest):

@@ -82,13 +82,19 @@ function renderText() {
         const input = inputs[index] || "";
 
         if (index === currentLine || index === currentLine - 1) {
+
             for (let i = 0; i < Math.max(line.length, input.length + 1); i++) {
                 const span = document.createElement("span");
                 if (i < input.length) {
                     span.textContent = input[i];
                     if (input[i] !== line[i]) {
                         if (input[i] === " ") span.textContent = "_";
-                        span.className = "incorrect";
+
+                        if (prolang == "sql") {
+                            span.className = sqlClassName(line, i, input[i]);
+                        } else {
+                            span.className = "incorrect";
+                        }
                     } else {
                         span.className = "correct";
                     }
