@@ -10,6 +10,7 @@
   <link rel="icon" type="image/png" href="{% static 'typer/favicon.png' %}">
   <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="{% static 'main/css/typer.css' %}">
+  <link rel="stylesheet" href="{% static 'main/css/footer.css' %}">
   <link rel="stylesheet" href="{% static 'main/css/result.css' %}">
 </head>
 <body>
@@ -33,6 +34,8 @@
     <button id="restartBtn" class="btn btn-primary">Restart</button>
     <button id="newTextBtn" class="btn">New Text</button>
   </div>
+
+  {% include 'footer.html' %}
 
   <script src="{% static 'main/js/html_tags.js' %}"></script>
   <script src="{% static 'main/js/wpm.js' %}"></script>
